@@ -1,151 +1,125 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import { useState } from "react";
-import "../../../../lib/leaflet";
+import { useCallback } from "react";
+import dynamic from "next/dynamic";
+
+/* --------------------------------------------------
+   Dynamically import the map (SSR disabled)
+-------------------------------------------------- */
+const LocationMap = dynamic(() => import("../../LocationMap"), {
+  ssr: false,
+});
+
+/* --------------------------------------------------
+   Types
+-------------------------------------------------- */
+interface LocationState {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  unit: string;
+}
 
 interface StepTwoProps {
-  location: {
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    unit: string;
-  };
-  setLocation: React.Dispatch<
-    React.SetStateAction<{
-      street: string;
-      city: string;
-      state: string;
-      zip: string;
-      unit: string;
-    }>
-  >;
+  location: LocationState;
+  setLocation: React.Dispatch<React.SetStateAction<LocationState>>;
 }
 
-function LocationPicker({
-  setLocation,
-}: {
-  setLocation: StepTwoProps["setLocation"];
-}) {
-  const [position, setPosition] = useState<[number, number]>([6.5244, 3.3792]);
-
-  useMapEvents({
-    async click(e) {
-      const { lat, lng } = e.latlng;
-      setPosition([lat, lng]);
-
-      // Reverse geocoding (OpenStreetMap)
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-      );
-      const data = await res.json();
-
+/* --------------------------------------------------
+   Component
+-------------------------------------------------- */
+export default function StepTwo({ location, setLocation }: StepTwoProps) {
+  const handleChange = useCallback(
+    (field: keyof LocationState, value: string) => {
       setLocation((prev) => ({
         ...prev,
-        street: data.address.road || "",
-        city:
-          data.address.city || data.address.town || data.address.village || "",
-        state: data.address.state || "",
-        zip: data.address.postcode || "",
+        [field]: value,
       }));
     },
-  });
-
-  return <Marker position={position} />;
-}
-
-function StepTwo({ location, setLocation }: StepTwoProps) {
-  const handleChange = (field: keyof typeof location, value: string) => {
-    setLocation((prev) => ({ ...prev, [field]: value }));
-  };
+    [setLocation]
+  );
 
   return (
-    <div>
-      <div className="border-b pb-2 border-gray-200">
-        <h2 className="mb-1 text-xl font-semibold text-[#101418]">
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="border-b border-gray-200 pb-2">
+        <h2 className="text-xl font-semibold text-[#101418]">
           Property Location
         </h2>
         <p className="text-sm text-[#818891]">
-          Click on the map to auto‑fill the property address.
+          Click on the map to auto-fill the property address.
         </p>
       </div>
 
-      <div className="flex gap-5">
-        <div className="mt-6 space-y-4 w-1/2">
+      {/* Content */}
+      <div className="flex gap-6">
+        {/* Address form */}
+        <div className="w-1/2 space-y-4">
           <div>
-            <p className="mb-1.5 text-gray-700">Street Address</p>
+            <label className="block mb-1.5 text-gray-700">
+              Street Address
+            </label>
             <input
-              placeholder="Street"
-              className="w-full border px-3 py-2 rounded"
               value={location.street}
               onChange={(e) => handleChange("street", e.target.value)}
+              placeholder="Street"
+              className="w-full rounded border px-3 py-2"
             />
           </div>
 
           <div className="flex gap-4">
-            <div>
-              <p className="mb-1.5 text-gray-700">City</p>
+            <div className="w-1/2">
+              <label className="block mb-1.5 text-gray-700">City</label>
               <input
-                placeholder="City"
-                className="w-full border px-3 py-2 rounded"
                 value={location.city}
                 onChange={(e) => handleChange("city", e.target.value)}
+                placeholder="City"
+                className="w-full rounded border px-3 py-2"
               />
             </div>
-            <div>
-              <p className="mb-1.5 text-gray-700">State</p>
 
+            <div className="w-1/2">
+              <label className="block mb-1.5 text-gray-700">State</label>
               <input
-                placeholder="State"
-                className="w-full border px-3 py-2 rounded"
                 value={location.state}
                 onChange={(e) => handleChange("state", e.target.value)}
+                placeholder="State"
+                className="w-full rounded border px-3 py-2"
               />
             </div>
           </div>
 
           <div className="flex gap-4">
-            <div>
-              <p className="mb-1.5 text-gray-700">ZIP Code</p>{" "}
+            <div className="w-1/2">
+              <label className="block mb-1.5 text-gray-700">ZIP Code</label>
               <input
-                placeholder="ZIP"
-                className="w-full border px-3 py-2 rounded"
                 value={location.zip}
                 onChange={(e) => handleChange("zip", e.target.value)}
+                placeholder="ZIP"
+                className="w-full rounded border px-3 py-2"
               />
             </div>
 
-            <div>
-              <p className="mb-1.5 text-gray-700">Unit / Suite (optional)</p>{" "}
+            <div className="w-1/2">
+              <label className="block mb-1.5 text-gray-700">
+                Unit / Suite (optional)
+              </label>
               <input
-                placeholder="Unit / Suite"
-                className="w-full border px-3 py-2 rounded"
                 value={location.unit}
                 onChange={(e) => handleChange("unit", e.target.value)}
+                placeholder="Unit / Suite"
+                className="w-full rounded border px-3 py-2"
               />
             </div>
           </div>
         </div>
 
-        <div className="mt-5 h-75 w-1/2 rounded overflow-hidden border">
-          <MapContainer
-            center={[6.5244, 3.3792]}
-            zoom={13}
-            className="h-full w-full">
-            <TileLayer
-              attribution="&copy; OpenStreetMap"
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <LocationPicker setLocation={setLocation} />
-          </MapContainer>
+        {/* Map */}
+        <div className="w-1/2 h-80 rounded overflow-hidden border">
+          <LocationMap setLocation={setLocation} />
         </div>
       </div>
-
-      {/* Address Inputs */}
     </div>
   );
 }
-
-export default StepTwo;

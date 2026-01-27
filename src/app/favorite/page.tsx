@@ -33,11 +33,13 @@ const FavoritesPage = () => {
 
   const removeFavorite = (id: string) => {
     setFavorites((prev) => {
-      const updated = prev.filter((fav) => fav !== id); // no conversion needed
+      const updated = prev.filter((fav) => fav !== id);
       localStorage.setItem("favorites", JSON.stringify(updated));
-      window.dispatchEvent(new Event("favoritesChanged"));
       return updated;
     });
+
+    // side effect OUTSIDE setState
+    window.dispatchEvent(new Event("favoritesChanged"));
   };
 
   // filter favorite listings
@@ -46,7 +48,7 @@ const FavoritesPage = () => {
   );
 
   return (
-    <Container className="mt-6">
+    <Container className="mt-6 mb-12">
       <div className="flex items-center gap-4 text-sm pt-6">
         <Link href="/" className="text-[#667a93] hover:text-gray-800">
           Home
@@ -65,7 +67,7 @@ const FavoritesPage = () => {
               key={item.id}
               className="rounded-lg overflow-hidden border hover:shadow-lg transition relative">
               <div className="flex">
-                <div className="relative h-76 w-1/2">
+                <div className="relative h-auto w-1/2">
                   {/* REMOVE FAVORITE */}
                   <button
                     onClick={() => removeFavorite(item.id)}
@@ -132,8 +134,8 @@ const FavoritesPage = () => {
 
                   <div className="flex items-end justify-end">
                     <Link
-                      href={`/listing/${item.id}`}
-                      className="bg-[#089589] px-4 py-3 text-white inline-flex items-center gap-2 mt-4 rounded-md hover:scale-105 transition-all duration-200">
+                      href={`/listings/${item.id}`}
+                      className="bg-[#089589] px-4 py-3 text-white inline-flex items-center gap-2 mt-2 rounded-md hover:scale-105 transition-all duration-200">
                       View Details
                       <GoArrowRight />
                     </Link>

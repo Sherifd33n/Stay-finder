@@ -12,18 +12,21 @@ import Container from "../Container";
 import { listings } from "@/data/listing";
 import HomeSearch, { Filters } from "./HomeSearch";
 import Link from "next/link";
+import { motion } from "framer-motion";
+
 import {
   toggleFavorite,
   // isFavorite,
   getFavorites,
 } from "../../../lib/favorite";
 
+
+
 type Category = "all" | "house" | "hotel" | "warehouse" | "land" | "apartment";
 
 const All = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  
   useEffect(() => {
     const syncFavorites = () => {
       setFavorites(getFavorites());
@@ -34,7 +37,6 @@ const All = () => {
     return () => window.removeEventListener("favoritesChanged", syncFavorites);
   }, []);
 
-  // Tabs
   const [active, setActive] = useState<Category>("all");
 
   type CategoryOption = {
@@ -52,7 +54,6 @@ const All = () => {
     { id: "apartment", label: "Apartment", icon: <MdApartment size={30} /> },
   ];
 
-  // Filters
   const [searchFilters, setSearchFilters] = useState<Filters>({
     location: "",
     category: "all",
@@ -87,26 +88,23 @@ const All = () => {
   }, [appliedFilters]);
 
   return (
-    <Container className="mx-auto flex flex-col gap-6">
-      {/* Hero */}
-      <div className="text-center py-7">
+    <Container className="mx-auto flex flex-col gap-6 pb-12">
+      <div className="text-center pb-7 pt-12">
         <p className="text-5xl font-semibold text-[#0f172a]">
           Find your{" "}
           <span className="text-[#089589] underline">perfect place.</span>
         </p>
-        <p className="text-[#8490a2] text-[16px] mt-1">
+        <p className="text-[#8490a2] text-[16px] mt-2">
           Houses, Apartments, Lands and Commercial Places for Rent or Sale.
         </p>
       </div>
 
-      {/* Search */}
       <HomeSearch
         filters={searchFilters}
         setFilters={setSearchFilters}
         onSearch={handleSearch}
       />
 
-      {/* Tabs */}
       <div className="flex justify-between items-center mt-8 flex-wrap">
         <div className="flex gap-10 items-center flex-wrap">
           {options.map((option) => {
@@ -125,7 +123,7 @@ const All = () => {
                 onClick={() => setActive("all")}
                 className={`flex flex-col gap-1 items-center py-1 transition ${
                   active === option.id
-                    ? "text-[#0d1527] border-b-2 border-[#0d1527]"
+                    ? "text-[#0d1527] border-b-3 border-[#0d1527]"
                     : "text-[#6c707c]"
                 }`}>
                 {content}
@@ -137,7 +135,7 @@ const All = () => {
                 onClick={() => setActive(option.id)}
                 className={`flex flex-col gap-1 items-center py-1 transition ${
                   active === option.id
-                    ? "text-[#0d1527] border-b-2 border-[#0d1527]"
+                    ? "text-[#0d1527] border-b-3 border-[#0d1527]"
                     : "text-[#6c707c]"
                 }`}>
                 {content}
@@ -151,20 +149,15 @@ const All = () => {
         </div>
       </div>
 
-      {/* Listings */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-5 border-t border-gray-300 pt-8">
-        {filteredListings.map((item) => (
-          <Link
-            href={`/listing/${item.id}`}
+        {filteredListings.slice(0, 8).map((item) => (
+          <div
             key={item.id}
-            className="rounded-lg overflow-hidden border hover:shadow-lg transition relative">
+            className="relative rounded-lg overflow-hidden border hover:shadow-lg transition">
+            {/* Favorite button OUTSIDE Link */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                e.preventDefault()
-                toggleFavorite(item.id.toString());
-              }}
-              className="absolute top-2 right-2 z-20 bg-white rounded-full p-1.5 shadow hover:scale-110 transition">
+              onClick={() => toggleFavorite(item.id.toString())}
+              className="absolute top-2 right-2 z-20 bg-white rounded-full p-1.5 shadow">
               {favorites.includes(item.id.toString()) ? (
                 <AiFillHeart size={20} className="text-red-500" />
               ) : (
@@ -172,32 +165,40 @@ const All = () => {
               )}
             </button>
 
-            <div className="relative h-36 w-full">
-              <Image
-                src={item.images[0]}
-                alt={item.title}
-                fill
-                className="object-cover"
-              />
-            </div>
+            {/* Only navigation content inside Link */}
+            <Link href={`/listings/${item.id}`} className="block">
+              <div className="relative h-36 w-full">
+                <Image
+                  src={item.images[0]}
+                  alt={item.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
 
-            <div className="p-3">
-              <h3 className="font-semibold text-[#101418]">{item.title}</h3>
-              <p className="text-sm text-gray-500">
-                ₦{item.price.toLocaleString()}
-              </p>
-            </div>
-
-            <p
-              className={`absolute top-1.5 left-1.5 px-2 py-1 rounded-md text-[12px] uppercase ${
-                item.mode === "rent"
-                  ? "bg-white text-black"
-                  : "bg-[#d94d22] text-white"
-              }`}>
-              {item.mode}
-            </p>
-          </Link>
+              <div className="p-3">
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="text-sm text-gray-500">
+                  ₦{item.price.toLocaleString()}
+                </p>
+              </div>
+            </Link>
+          </div>
         ))}
+      </div>
+
+      <div className="mx-auto mt-4">
+        <Link href="/explore">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{
+              repeat: Infinity,
+              duration: 2,
+              ease: "linear",
+            }}
+            whileHover={{ scale: 1.1 }}
+            className="w-10 h-10 rounded-full border-4 border-gray-300 border-t-black cursor-pointer inline-flex items-center justify-center"></motion.div>
+        </Link>
       </div>
     </Container>
   );

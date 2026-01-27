@@ -31,7 +31,6 @@ const Navbar = () => {
 
     updateCount();
 
-    // Listen for both storage event (other tabs) and custom event (same page)
     window.addEventListener("storage", updateCount);
     window.addEventListener("favoritesChanged", updateCount);
 
