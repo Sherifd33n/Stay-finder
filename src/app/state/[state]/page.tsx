@@ -76,7 +76,7 @@ export default function StatePage() {
       </div>
 
       {/* ===== CONTENT ===== */}
-      <Container className="mt-10">
+      <Container className="my-10">
         <Link
           href="/properties"
           className="text-base text-gray-500 hover:underline">
@@ -152,7 +152,7 @@ export default function StatePage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.25 }}>
                   <Link
-                    href={`/listing/${item.id}`}
+                    href={`/listings/${item.id}`}
                     className="border rounded-lg overflow-hidden hover:shadow-lg transition block">
                     <div className="relative h-40 w-full">
                       <Image

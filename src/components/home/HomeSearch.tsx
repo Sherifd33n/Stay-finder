@@ -71,7 +71,7 @@ const HomeSearch: React.FC<HomeSearchProps> = ({ filters, setFilters, onSearch }
         {/* Search Button */}
         <div
           onClick={onSearch}
-          className="bg-[#089589] rounded-full h-12.5 w-12.5 flex items-center justify-center cursor-pointer"
+          className="bg-[#089589] rounded-full h-12.5 w-12.5 flex items-center justify-center cursor-pointer hover:scale-105 transition-all duration-200"
         >
           <IoSearch size={25} className="text-white" />
         </div>

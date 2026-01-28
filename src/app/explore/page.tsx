@@ -5,7 +5,7 @@ import ExploreCard from "../ExploreCard";
 const page = () => {
   return (
     <Container>
-      <div className="text-center mt-10">
+      <div className="text-center my-10">
         <p className="text-4xl text-[#111827] font-semibold font-serif">
           Discover Your{" "}
           <span className="text-[#089589] font-medium italic">Next Spaces</span>

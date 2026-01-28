@@ -91,7 +91,7 @@ export default function StateListingsSlider({ state, listings }: Props) {
                 </h3>
               </div>
 
-              <Link href={`/listing/${item.id}`}>
+              <Link href={`/listings/${item.id}`}>
                 <button className="text-center w-full bg-[#d4d2d3] py-1.5 font-medium border border-gray-400 rounded-lg hover:text-[#d4d2d3] hover:bg-white transition duration-200 cursor-pointer">
                   View Details
                 </button>
